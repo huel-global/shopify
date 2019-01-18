@@ -1,0 +1,11 @@
+{
+    "name": "huelify/shopify",
+    "autoload": {
+        "psr-4": {
+            "Huelify\\Shopify\\": "src"
+        }
+    },
+    "require": {
+        "illuminate/support": "5.*"
+    }
+}
