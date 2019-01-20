@@ -63,6 +63,8 @@ Route::get('oauth/done', function(Request $request) {
     if (!$shop) {
         \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - creating account.');
         $user = new \App\User;
+        $user->name = $shopDomain;
+        $user->password = '';
         $user->email = 'owner@'.$shopDomain;
         $user->save();
 

@@ -26,11 +26,6 @@ class CreateShopsTable extends Migration
             $table->string('access_token');
             $table->string('access_token_refreshed_at')->nullable();
         });
-
-        Schema::table('users', function($table) {
-            $table->string('name', 255)->nullable()->change();
-            $table->string('password', 255)->nullable()->change();
-        });
     }
 
     /**
