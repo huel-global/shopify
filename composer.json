@@ -1,5 +1,5 @@
 {
-    "name": "huelify/shopify",
+    "name": "huel-global/shopify",
     "autoload": {
         "psr-4": {
             "Huelify\\Shopify\\": "src"
