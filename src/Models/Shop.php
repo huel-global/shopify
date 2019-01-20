@@ -3,9 +3,6 @@ namespace Huelify\Shopify\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\UserProvider;
-
 class Shop extends Model {
     protected $table = 'shops';
 
@@ -13,14 +10,9 @@ class Shop extends Model {
         return $this->belongsTo('App\User', 'user_id');
     }
 
-    // public function login() {
-        // \Log::info('[Huelify] Try starting a session ' . json_encode($this->user));
-        // \Log::info('[Huelify] Try validating a session ' . json_encode(\Auth::validateCredentials($this->user)));
-        // \Auth::login($this->user);
-        // \Log::info('log in ID: ' . $this->user->id);
-        // \Auth::loginUsingId(5);
-        // $credentials = $this->user->only('email');
-    // }
+    public function login() {
+        \Auth::login($this->user);
+    }
 
     public function logout() {
         \Auth::logout();

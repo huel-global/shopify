@@ -1,16 +1,13 @@
 <?php
 
-Route::get('oauth', function(\Illuminate\Http\Request $request) {
+use Illuminate\Http\Request;
+
+Route::get('oauth', function(Request $request) {
     $shopDomain = $request->get('shop');
-    \Log::info('[Huelify] About to get OAuth request for ['.$shopDomain.']');
-    \Log::info('[Huelify] User info ' . json_encode($request->user()));
+    \Log::info('[Huelify] OAuth request for ['.$shopDomain.']');
     if (!$shopDomain) {
         return abort(403);
     } else {
-        \Log::info('[Huelify] Got OAuth request for ['.$shopDomain.']');
-        \Log::info('[Huelify] Is it logged in? ' . json_encode(\Auth::check()));
-        
-
         if ($request->user() && $request->user()->shop && $request->user()->shop->shop_domain == $shopDomain) {
             $api = app('ShopifyAPI');
             $api->setup([
@@ -27,7 +24,6 @@ Route::get('oauth', function(\Illuminate\Http\Request $request) {
             }
         }
 
-
         $api = app('ShopifyAPI');
         $api->setup([
             'SHOP_DOMAIN' => $shopDomain
@@ -35,14 +31,12 @@ Route::get('oauth', function(\Illuminate\Http\Request $request) {
         $easdk = app('ShopifyEASDK');
         $easdk->setAPI($api);
 
-        // \Log::info('[Huelify] Got OAuth for user ' . json_encode($easdk->getAPI()));
-
         echo $easdk->hostedRedirect($shopDomain, $api->installURL(\URL::to('/oauth/done/'), \Config::get('huelify_shopify.scopes')));
         exit;
     }
-})->name('login');
+})->middleware('web');
 
-Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
+Route::get('oauth/done', function(Request $request) {
     $shopDomain = $request->get('shop');
     $api = app('ShopifyAPI');
     $api->setup([
@@ -50,7 +44,7 @@ Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
     ]);
 
     if (!$api->verifyRequest($request->all())) {
-        \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] could not be verified.');
+        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] could not be verified.');
         return redirect()->to('/oauth?shop='.$shopDomain);
     }
 
@@ -60,14 +54,14 @@ Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
             'ACCESS_TOKEN' => $accessToken
         ]);
     } catch (\Exception $ex) {
-        \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] failed - retrying.');
+        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] failed - retrying.');
         return redirect()->to('/oauth/?shop='.$shopDomain);
     }
 
     $shop = \App\Shop::findByDomain($shopDomain);
 
     if (!$shop) {
-        \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] successful - creating account.');
+        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - creating account.');
         $user = new \App\User;
         $user->email = 'owner@'.$shopDomain;
         $user->save();
@@ -79,14 +73,14 @@ Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
         $shop->save();
     }
 
-    \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] successful - logging in.');
+    \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - logging in.');
     $shop->access_token = $accessToken;
     $shop->save();
 
-    // $shop->login();
+    $shop->login();
 
     if (count(\Config::get('huelify_shopify.webhooks')) > 0) {
-        \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] successful - setting up webhooks.');
+        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - setting up webhooks.');
 
         foreach (\Config::get('huelify_shopify.webhooks') as $hook) {
             if (count($api->call('get', '/admin/webhooks.json', ['topic' => $hook['topic'], 'address' => $hook['address']])->webhooks) == 0) {
@@ -100,7 +94,7 @@ Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
     $api = $shop->getAPI();
 
     if (count(\Config::get('huelify_shopify.script_tags')) > 0) {
-        \Log::info('huelify/shopify: OAuth request for ['.$shopDomain.'] successful - setting up scripttags.');
+        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - setting up scripttags.');
 
         foreach (\Config::get('huelify_shopify.script_tags') as $url) {
             if (count($api->call('get', '/admin/script_tags.json', ['src' => $url])->script_tags) == 0) {
@@ -115,4 +109,4 @@ Route::get('oauth/done', function(\Illuminate\Http\Request $request) {
     }
 
     return redirect()->intended('/app/');
-});
+})->middleware('web');
