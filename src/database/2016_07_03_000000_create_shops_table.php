@@ -21,10 +21,15 @@ class CreateShopsTable extends Migration
                   ->references('id')
                   ->on('users');
 
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('shop_domain');
             $table->string('access_token');
-            $table->string('access_token_refreshed_at');
+            $table->string('access_token_refreshed_at')->nullable();
+        });
+
+        Schema::table('users', function($table) {
+            $table->string('name', 255)->nullable()->change();
+            $table->string('password', 255)->nullable()->change();
         });
     }
 
