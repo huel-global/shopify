@@ -3,7 +3,6 @@
 namespace Huelify\Shopify\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Auth\Guard;
 
 class ViewMiddleware {
     public function __construct() {
