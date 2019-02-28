@@ -1,23 +1,23 @@
 <?php
-namespace Huelify\Shopify\Providers;
+namespace Huel\Shopify\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-use Huelify\Shopify\API;
+use Huel\Shopify\API;
 
 
 class APIServiceProvider extends ServiceProvider {
     public function register() {
         // Publish configuration
         $this->publishes([
-            __DIR__.'/../config/huelify_shopify.php' => config_path('huelify_shopify.php')
+            __DIR__.'/../config/huel_shopify.php' => config_path('huel_shopify.php')
         ]);
 
         $this->app->bind('ShopifyAPI', function($app) {
             return new API;
         });
 
-        $this->app->bind(Huelify\Shopify\API::class, function($app) {
+        $this->app->bind(Huel\Shopify\API::class, function($app) {
             return new API;
         });
 

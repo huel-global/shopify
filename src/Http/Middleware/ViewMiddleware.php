@@ -1,6 +1,6 @@
 <?php
 
-namespace Huelify\Shopify\Http\Middleware;
+namespace Huel\Shopify\Http\Middleware;
 
 use Closure;
 

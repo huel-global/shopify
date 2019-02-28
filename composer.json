@@ -2,7 +2,7 @@
     "name": "huel-global/shopify",
     "autoload": {
         "psr-4": {
-            "Huelify\\Shopify\\": "src"
+            "Huel\\Shopify\\": "src"
         }
     },
     "require": {

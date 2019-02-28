@@ -1,9 +1,9 @@
 <?php
-namespace Huelify\Shopify\Providers;
+namespace Huel\Shopify\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-use Huelify\Shopify\EASDK;
+use Huel\Shopify\EASDK;
 
 
 class EASDKServiceProvider extends ServiceProvider {
@@ -16,7 +16,7 @@ class EASDKServiceProvider extends ServiceProvider {
             return new EASDK;
         });
 
-        $this->app->bind(Huelify\Shopify\EASDK::class, function($app) {
+        $this->app->bind(Huel\Shopify\EASDK::class, function($app) {
             return new EASDK;
         });
 

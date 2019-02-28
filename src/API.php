@@ -1,5 +1,5 @@
 <?php
-namespace Huelify\Shopify;
+namespace Huel\Shopify;
 
 class API {
     private $api_key = '';
@@ -25,10 +25,10 @@ class API {
      * Resets setup back to configuration defaults.
      */
     public function setupFromConfig() {
-        $this->api_key = config('huelify_shopify.public_credentials.api_key');
-        $this->api_secret = config('huelify_shopify.public_credentials.api_secret');
-        $this->shop_domain = config('huelify_shopify.private_credentials.shop_domain');
-        $this->access_token = config('huelify_shopify.private_credentials.access_token');
+        $this->api_key = config('huel_shopify.public_credentials.api_key');
+        $this->api_secret = config('huel_shopify.public_credentials.api_secret');
+        $this->shop_domain = config('huel_shopify.private_credentials.shop_domain');
+        $this->access_token = config('huel_shopify.private_credentials.access_token');
     }
 
 

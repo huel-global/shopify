@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 
 Route::get('oauth', function(Request $request) {
     $shopDomain = $request->get('shop');
-    \Log::info('[Huelify] OAuth request for ['.$shopDomain.']');
+    \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.']');
     if (!$shopDomain) {
         return abort(403);
     } else {
@@ -17,7 +17,7 @@ Route::get('oauth', function(Request $request) {
 
             try {
                 $api->call('get',' /admin/shop.json');
-                \Log::info('[Huelify] Test API ' . json_encode($api));
+                \Log::info('[Huel\Shopify] Test API ' . json_encode($api));
                 return redirect()->to('/app');
             } catch (\Exception $ex) {
                 \Log::info('ERROR ' . json_encode($ex));
@@ -31,7 +31,7 @@ Route::get('oauth', function(Request $request) {
         $easdk = app('ShopifyEASDK');
         $easdk->setAPI($api);
 
-        echo $easdk->hostedRedirect($shopDomain, $api->installURL(\URL::to('/oauth/done/'), \Config::get('huelify_shopify.scopes')));
+        echo $easdk->hostedRedirect($shopDomain, $api->installURL(\URL::to('/oauth/done/'), \Config::get('huel_shopify.scopes')));
         exit;
     }
 })->middleware('web');
@@ -44,7 +44,7 @@ Route::get('oauth/done', function(Request $request) {
     ]);
 
     if (!$api->verifyRequest($request->all())) {
-        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] could not be verified.');
+        \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] could not be verified.');
         return redirect()->to('/oauth?shop='.$shopDomain);
     }
 
@@ -54,14 +54,14 @@ Route::get('oauth/done', function(Request $request) {
             'ACCESS_TOKEN' => $accessToken
         ]);
     } catch (\Exception $ex) {
-        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] failed - retrying.');
+        \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] failed - retrying.');
         return redirect()->to('/oauth/?shop='.$shopDomain);
     }
 
     $shop = \App\Shop::findByDomain($shopDomain);
 
     if (!$shop) {
-        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - creating account.');
+        \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] successful - creating account.');
         $user = new \App\User;
         $user->name = $shopDomain;
         $user->password = '';
@@ -75,16 +75,16 @@ Route::get('oauth/done', function(Request $request) {
         $shop->save();
     }
 
-    \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - logging in.');
+    \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] successful - logging in.');
     $shop->access_token = $accessToken;
     $shop->save();
 
     $shop->login();
 
-    if (count(\Config::get('huelify_shopify.webhooks')) > 0) {
-        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - setting up webhooks.');
+    if (count(\Config::get('huel_shopify.webhooks')) > 0) {
+        \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] successful - setting up webhooks.');
 
-        foreach (\Config::get('huelify_shopify.webhooks') as $hook) {
+        foreach (\Config::get('huel_shopify.webhooks') as $hook) {
             if (count($api->call('get', '/admin/webhooks.json', ['topic' => $hook['topic'], 'address' => $hook['address']])->webhooks) == 0) {
                 $api->call('post', '/admin/webhooks.json', [
                     'webhook' => $hook
@@ -95,10 +95,10 @@ Route::get('oauth/done', function(Request $request) {
 
     $api = $shop->getAPI();
 
-    if (count(\Config::get('huelify_shopify.script_tags')) > 0) {
-        \Log::info('[Huelify] OAuth request for ['.$shopDomain.'] successful - setting up scripttags.');
+    if (count(\Config::get('huel_shopify.script_tags')) > 0) {
+        \Log::info('[Huel\Shopify] OAuth request for ['.$shopDomain.'] successful - setting up scripttags.');
 
-        foreach (\Config::get('huelify_shopify.script_tags') as $url) {
+        foreach (\Config::get('huel_shopify.script_tags') as $url) {
             if (count($api->call('get', '/admin/script_tags.json', ['src' => $url])->script_tags) == 0) {
                 $api->call('post', '/admin/script_tags.json', [
                     'script_tag' => [

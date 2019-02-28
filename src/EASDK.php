@@ -1,5 +1,5 @@
 <?php
-namespace Huelify\Shopify;
+namespace Huel\Shopify;
 
 class EASDK {
     private $api;

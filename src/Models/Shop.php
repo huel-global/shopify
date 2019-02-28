@@ -1,5 +1,5 @@
 <?php
-namespace Huelify\Shopify\Models;
+namespace Huel\Shopify\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
