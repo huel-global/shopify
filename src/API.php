@@ -94,10 +94,6 @@ class API {
         return $calculated === $match;
     }
 
-
-
-
-
     /**
      * Calls API and returns OAuth Access Token, which will be needed for all future requests
      */
@@ -161,6 +157,44 @@ class API {
         }
     }
 
+    private static function stripSchemeAndHost($url) {
+        $parsedUrl = parse_url($url);
+
+        return sprintf(
+            '%s%s%s',
+            $parsedUrl['path'] ?? null,
+            isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : null,
+            isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : null,
+        );
+    }
+
+    private static function parseLinksHeader(string $linkHeader) {
+        $links = explode(', ', $linkHeader);
+    
+        $map = [];
+        foreach ($links as $link) {
+            $linkRegex = '/<(.*)>; rel="(.*)"/';
+    
+            $matches = [];
+            preg_match($linkRegex, $link, $matches);
+            
+            if (count($matches) < 3) {
+                continue;
+            }
+
+            $stripedUrl = self::stripSchemeAndHost($matches[1]);
+            $parsedUrl = parse_url($matches[1]);
+
+            $params = [];
+            parse_str($parsedUrl['query'], $params); 
+
+            $map[$matches[2]] = (object) [
+                'url' => $stripedUrl,
+                'params' => (object) $params,
+            ];
+        }
+        return (object) $map;
+    }
 
 
     public function call($method = 'GET', $url = '/', $data = [], $options = []) {
@@ -303,13 +337,18 @@ class API {
                         \Log::info('[Shopify]: Sleeping for 1 (rate limit)');
                         sleep(1);
                     }
-                    break;
+                }
+
+                if (strpos($header, 'Link:') === 0) {
+                    $matches = [];
+                    preg_match('/.*: (.*)/', $header, $matches);
+                    $linkHeaderValue = $matches[1];
+
+                    $result->links = self::parseLinksHeader($linkHeaderValue);
                 }
             }
 
         }
-
-
 
         // Parse extra info
         $returnInfo = null;
