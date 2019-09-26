@@ -339,7 +339,7 @@ class API {
                     }
                 }
 
-                if (strpos($header, 'Link:') === 0) {
+                if (stripos($header, 'Link:') === 0) {
                     $matches = [];
                     preg_match('/.*: (.*)/', $header, $matches);
                     $linkHeaderValue = $matches[1];
