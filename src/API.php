@@ -164,7 +164,7 @@ class API {
             '%s%s%s',
             $parsedUrl['path'] ?? null,
             isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : null,
-            isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : null,
+            isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : null
         );
     }
 
