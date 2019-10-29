@@ -16,7 +16,7 @@ class CreateShopsTable extends Migration
             $table->increments('id');
             $table->timestamps();
 
-            $table->integer('user_id')->unsigned();
+            $table->unsignedBigInteger('user_id')->unsigned();
             $table->foreign('user_id')
                   ->references('id')
                   ->on('users');
