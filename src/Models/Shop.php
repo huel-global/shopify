@@ -32,7 +32,7 @@ class Shop extends Model {
         ];
 
         //if the api key and shared secret is set in the shops table use the values for shopify api authentication (private app use)
-        if (Schema::hasColumn('shops', 'api_key') && Schema::hasColumn('shops', 'shared_secret')) {
+        if (Schema::hasColumn('shops', 'api_key') && Schema::hasColumn('shops', 'api_secret')) {
             $shopifyCredentials['API_KEY'] = $this->api_key;
             $shopifyCredentials['API_SECRET'] = $this->api_secret;
         }
