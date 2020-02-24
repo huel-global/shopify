@@ -2,6 +2,7 @@
 namespace Huel\Shopify\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class Shop extends Model {
     protected $table = 'shops';
@@ -24,10 +25,20 @@ class Shop extends Model {
 
     public function getAPI() {
         $api = app('ShopifyAPI');
-        $api->setup([
+
+        $shopifyCredentials = [
             'SHOP_DOMAIN' => $this->shop_domain,
             'ACCESS_TOKEN' => $this->access_token
-        ]);
+        ];
+
+        //if the api key and shared secret is set in the shops table use the values for shopify api authentication (private app use)
+        if (Schema::hasColumn('shops', 'api_key') && Schema::hasColumn('shops', 'shared_secret')) {
+            $shopifyCredentials['API_KEY'] = $this->api_key;
+            $shopifyCredentials['API_SECRET'] = $this->api_secret;
+        }
+
+        $api->setup();
+
         return $api;
     }
 
