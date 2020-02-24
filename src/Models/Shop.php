@@ -37,7 +37,7 @@ class Shop extends Model {
             $shopifyCredentials['API_SECRET'] = $this->api_secret;
         }
 
-        $api->setup();
+        $api->setup($shopifyCredentials);
 
         return $api;
     }
