@@ -109,6 +109,12 @@ Route::get('oauth/done', function(Request $request) {
             }
         }
     }
+    //redirect to custom url passed in as a cookie via a request or redirect
+    if ($request->hasCookie('redirect_url')) {
+        return redirect(
+            $request->cookie('redirect_url')
+        )->cookie(Cookie::forget('redirect_url'));
+    }
 
     return redirect()->intended('/app/');
 })->middleware('web');
