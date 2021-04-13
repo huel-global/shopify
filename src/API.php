@@ -84,7 +84,14 @@ class API {
 
         if (array_key_exists('hmac', $da)) {
             // HMAC Validation
-            $queryString = http_build_query(array('code' => $da['code'], 'shop' => $da['shop'], 'timestamp' => $da['timestamp']));
+
+			if (isset($da['host'])) {
+				$hash = array('code' => $da['code'], 'host' => $da['host'], 'shop' => $da['shop'], 'timestamp' => $da['timestamp']);
+			} else {
+				$hash = array('code' => $da['code'], 'shop' => $da['shop'], 'timestamp' => $da['timestamp']);
+			}
+
+            $queryString = http_build_query($hash);
             $match = $da['hmac'];
             $calculated = hash_hmac('sha256', $queryString, $this->api_secret);
         } else {
